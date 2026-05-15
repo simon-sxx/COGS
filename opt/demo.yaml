@@ -1,0 +1,120 @@
+dir_name: outputs/cls_outputs/1
+task_name: cogs_cnn
+
+log:
+  stdout: false
+  stderr: false
+  tensorboard: true
+
+data:
+  dataset: dsads
+  data_dir: ./data/
+  test_envs: 
+    - 1     # 0, 1, 2, 3
+  batch_size: 32
+  num_workers: 0
+  split_type: cross_person
+
+reproduc:
+  seed: 42
+  benchmark: false
+  deterministic: true
+
+ts_ood:
+  algorithm: COGS
+  taskname: dsads
+
+  total_epoch: 150
+  input_dim: 45
+  num_classes: 19
+  domain_classes: 3
+  t_length: 125
+  valid_every: 1
+  use_grad_clip: true
+
+  encoder:
+    model: mlp
+    hid_dim: 128
+    layer_num: 4
+    z_dim: 16
+    act_fn: leakyrelu
+    dropout: 0.1
+    use_norm: false
+    norm_type: ln
+
+  decoder:
+    model: mlp
+    hid_dim: 128
+    layer_num: 4
+    act_fn: leakyrelu
+    dropout: 0.1
+    use_norm: false
+    norm_type: ln
+
+  featurizer:
+    model: cnn
+    hid_channel: 32
+    out_channel: 32
+    kernel_size: 5
+
+  classifier:
+    type: linear  
+
+  env_infer:
+    env_prototype_num: 6
+    env_proto_dim: 32  
+    temperature_start: 1
+    temperature_end: 0.1
+    momentum: 0.8
+
+  graph_discov:
+    enable: true
+    prob: true
+    hard_mask: false
+
+    time_graph:
+      enable: false
+      time_cumu_type: equal
+      time_chunk_num: 200
+
+    freeze_epoch: 151
+    graph_thresh: 0.5
+    lambda_s_start: 6e-3
+    lambda_s_end: 6e-3
+    start_tau: 1
+    end_tau: 0.1
+    norm_by_shape: false
+
+    optim: adamW
+    scheduler: step
+    weight_decay: 0
+    lr_start: 1e-2
+    lr_end: 1e-3
+
+  cls_loss: ce
+  rec_loss: mse
+  rec_loss_weight: 0.1
+  lag: 1
+  kld_loss_weight: 0.1
+  vrex_weight: 3
+  independence_weight: 1
+  contras_loss_weight: 1
+
+  vae_optimizer:
+    optim: adamW
+    scheduler: step
+    weight_decay: 1e-4
+    lr_start: 1e-3
+    lr_end: 1e-3
+  cls_optimizer:
+    optim: adamW
+    scheduler: step
+    weight_decay: 1e-4
+    lr_start: 1e-4
+    lr_end: 1e-4
+  env_optimizer:
+    optim: adamW
+    scheduler: step
+    weight_decay: 1e-4
+    lr_start: 1e-3
+    lr_end: 1e-3
